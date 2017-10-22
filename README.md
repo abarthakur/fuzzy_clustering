@@ -42,6 +42,7 @@ where
 and
 * **centers** = list of final K centers of clusters
 * **u_mat** = final fuzzy partition
+* **labels** = final partition of points (hard partitioning used)
 * **others** = struct containing other useful values
       ** save_centers = list intermediate ( and initial + final) centers
       
@@ -55,7 +56,7 @@ where
 * **init_option** = option for choosing initial centers
       ** 1 (initialize centers and memberships from FCM)
       ** 2 (initialize memberships randomly, and calculate centers(using FCM memberships))
-      ** 2 (Use centers and memberships passed in **params**)
+      ** 3 (Use centers and memberships passed in **params**)
 * **params** = structure containing additional parameters
       ** init_centers = initial centers
       ** init_u = initial memberships
@@ -73,13 +74,65 @@ where
 and
 * **centers** = list of final K centers of clusters
 * **u_mat** = final fuzzy partition
+* **labels** = final partition of points (obtained using hard partitioning)
 * **others** = struct containing other useful values
       ** save_centers = list intermediate ( and initial + final) centers
       ** fcm_save_centers = list intermediate ( and initial + final) centers of FCM initialization
       ** eta = final value of eta
 
+## Interval Type-II Fuzzy C-Means
+[Hwang,Rhee(2007)](http://ieeexplore.ieee.org/document/4088987/)
 
+```[ centers,labels,no_iterations,others] = it2_fcm(points,no_clusters ,m1,m2 ,m,epsilon,MAX_ITER,init_option,params)```
 
+where 
+* **init_option** = option for choosing initial centers
+      ** 1 (initialize centers from FCM)
+      ** 2 (initialize centers randomly)
+      ** 3 (initialize centers from k-Means)
+      ** 2 (Use centers and memberships passed in **params**)
+* **params** = structure containing additional parameters
+      ** init_centers = initial centers
+      ** km_eps,km_max_iter = value of epsilon and MAX_ITER for Karnik-Mendel algorithm used for type reduction
+and
+* **centers** = list of final K centers of clusters
+* **labels** = final partition of points (obtained using hard partitioning)
+* **others** = struct containing other useful values
+      ** save_centers = list intermediate ( and initial + final) centers
+      ** fcm_save_centers/k_save_centers = list intermediate ( and initial + final) centers of FCM/k-means initialization
+
+## General Type-II Fuzzy C-Means
+[Linda,Manic(2012)](http://ieeexplore.ieee.org/document/6151823/)
+
+```[centers,labels,no_iterations,others] = gt2_fcm(points,no_clusters ,m_set,no_planes,epsilon,MAX_ITER,init_option,params)```
+
+where 
+* **m_set** = since the parameter m is modeled as a general fuzzy set, it can be represented as a list of pairs (m',u'), where u' is the membership of m'.
+* **no_planes** = number of alpha planes to be used 
+* **init_option** = option for choosing initial centers
+      ** 1 (initialize centers from FCM)
+      ** 2 (initialize centers randomly)
+      ** 3 (initialize centers from k-Means)
+      ** 2 (Use centers and memberships passed in **params**)
+* **params** = structure containing additional parameters
+      ** init_centers = initial centers
+      ** km_eps,km_max_iter = value of epsilon and MAX_ITER for Karnik-Mendel algorithm used for type reduction
+and
+* **centers** = list of final K centers of clusters
+* **labels** = final partition of points (obtained using hard partitioning)
+* **others** = struct containing other useful values
+      ** save_centers = list intermediate ( and initial + final) centers
+      ** fcm_save_centers/k_save_centers = list intermediate ( and initial + final) centers of FCM/k-means initialization
+
+## Karnik-Mendel algorithm
+
+The KM algorithm is used to reduce a 1-D fuzzy set. The function ``all_dimensions_km`` runs KM on every dimension of a set of D-dimensional features (where each multidimensional feature has a single membership) to find the switch points, and combine them according to the method proposed in Hwang et al. (2007) and Linda et al. (2012). It requires the sorted order of the points along every dimension.
+
+```[v_avg,u_avg,other_vals]=all_dimensions_km(points,sorted_order,u_lower,u_upper,m,epsilon,MAX_ITER)```
+
+## Example Code
+
+``test.m`` reads and normalizes the Iris dataset, and call ``run_cluster``. ``run_cluster`` runs the various clustering algorithms implemented and calculates the classification accuracy on the training set. ``run_cluster`` should be consulteed to see how to set the numerous parameters.
 
 
 
